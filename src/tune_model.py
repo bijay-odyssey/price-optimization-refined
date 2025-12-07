@@ -1,17 +1,21 @@
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 
-def tune_rf(model, X, y):
+def tune_model(model, X, y):
     params = {
-        "n_estimators": [100, 200],
-        "max_depth": [None, 10]
+        "n_estimators": [200, 400, 600],
+        "max_depth": [8, 10, 12],
+        "min_samples_leaf": [1, 5, 10]
     }
 
-    gs = GridSearchCV(
+    rs = RandomizedSearchCV(
         model,
         params,
+        n_iter=10,
+        scoring="neg_mean_absolute_error",
         cv=3,
-        scoring="neg_mean_absolute_error"
+        n_jobs=-1,
+        random_state=42
     )
 
-    gs.fit(X, y)
-    return gs.best_estimator_
+    rs.fit(X, y)
+    return rs.best_estimator_
